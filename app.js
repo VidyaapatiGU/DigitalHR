@@ -3,7 +3,7 @@ const express = require("express");
 const dotenv = require("dotenv").config();
 const cors = require("cors");
 const logger = require("./config/logger.js");
-const connectToMongo = require("./config/db.js");
+const { connectToMongo } = require("./config/db.js");
 const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require("fs");
@@ -12,26 +12,10 @@ const multer = require("multer");
 connectToMongo();
 
 const app = express();
-app.use(bodyParser.json({ limit: "30mb" })); // Set the limit as needed
+app.use(bodyParser.json({ limit: "30mb" })); 
 app.use(express.json());
 app.use(cors());
-/* app.use(
-  cors({
-    origin: "https://digitalhr.netlify.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true, // If you need to handle cookies or authentication headers
-  })
-);
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://digitalhr.netlify.app");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  next();
-}); */
 const port = process.env.PORT || 5001;
 
 AWS.config.update({
@@ -41,21 +25,14 @@ AWS.config.update({
   endpoint: "s3.eu-north-1.amazonaws.com",
 });
 
-// Create S3 service object
 const s3 = new AWS.S3({ apiVersion: "2006-03-01" });
 
-//@desc Test Backend API
-//@route GET /api/v1/
-//@access Public
 app.get("/api/v1/", (req, res) => {
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   res.status(200).send("Welcome to Backend API for DigitalHR");
-  logger.info(
-    `${ip}: API /api/v1/ responnded with "Welcome to Backend API for DigitalHR" `
-  );
+  logger.info(`${ip}: API /api/v1/ responded with "Welcome to Backend API for DigitalHR"`);
 });
 
-//Routes
 app.use("/api/v1/user", require("./routes/user.js"));
 app.use("/api/v1/team", require("./routes/team.js"));
 app.use("/api/v1/department", require("./routes/department.js"));
@@ -65,14 +42,13 @@ app.use("/api/v1/client", require("./routes/client.js"));
 app.use("/api/v1/document", require("./routes/document.js"));
 app.use("/api/v1/employee", require("./routes/employee.js"));
 app.use("/api/v1/attendance", require("./routes/attendance.js"));
+app.use("/api/v1/holiday", require("./routes/holidays.js"));
+app.use("/api/v1/settings", require("./routes/settings.js"));
 
-/* ///////////////////////////////////////////////--------//////////////////////////////////////////////////////////////////// */
-
-const upload2 = multer({ dest: "uploads/" }); // Destination folder for multer to store temporary files
+const upload2 = multer({ dest: "uploads/" });
 
 app.post("/client/upload/document", upload2.single("file"), (req, res) => {
-  const file = req.file; // File object
-
+  const file = req.file;
   const uploadParams = {
     Bucket: "digitalhrs3bucket",
     Key: file.originalname,
@@ -83,14 +59,17 @@ app.post("/client/upload/document", upload2.single("file"), (req, res) => {
     if (err) {
       console.log("Error", err);
       res.status(500).json({ error: err.message });
-    }
-    if (data) {
+    } else {
       console.log("Upload Success", data);
       res.status(201).json({ location: data });
     }
   });
 });
 
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => {
+    console.log(`App listening on port ${port}`);
+  });
+}
+
+module.exports = app; // Export app for testing

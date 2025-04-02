@@ -36,7 +36,7 @@ const addAttendance = async (req, res) => {
 
   console.log("Received data:", data);
   //console.log("req.params.id:", req.params.id);
-
+  logger.info(`${ip}: Received data: ${JSON.stringify(data)}`);
   // If validation errors exist, respond with 400
   if (!errors.isEmpty()) {
     logger.error(
@@ -57,6 +57,7 @@ const addAttendance = async (req, res) => {
           month_year: data.month_year,
           email: employeeData[i].email,
           name: employeeData[i].name,
+          emp_no: employeeData[i].emp_code,
           present: employeeData[i].present,
           totalWorkingDays: data.totalWorkingDays,
           numberOfLOP: employeeData[i].numberOfLOP,
@@ -67,6 +68,7 @@ const addAttendance = async (req, res) => {
           absentDaysPL: employeeData[i].absentDaysPL,
           numberOfSL: employeeData[i].numberOfSL,
           absentDaysSL: employeeData[i].absentDaysSL,
+          numberOfOT: employeeData[i].numberOfOT,
           month: data.month,
           year: data.year,
           remark: employeeData[i].remark || "NA",
@@ -133,6 +135,7 @@ const addSingleAttendance = async (req, res) => {
         month_year: data.month_year,
         email: data.email,
         name: data.name,
+        emp_no: data.emp_no,
         present: data.present,
         totalWorkingDays: data.totalWorkingDays,
 
@@ -200,6 +203,7 @@ const getAllAttendanceByClient = async (req, res) => {
 //@route GET /api/v1/attendance/get/:client_user_id/:month_year
 //@access Private: Needs Login
 const getAttendanceById = async (req, res) => {
+  logger.info("getAttendanceById function started");
   const data = matchedData(req);
   const client_user_id = req.params.client_user_id;
   const month_year = req.params.month_year;
@@ -248,7 +252,7 @@ const getLatestAttendance = async (req, res) => {
         logger.info(
           `${ip}: API /api/v1/attendance/get/latest/:client_user_id | User: ${user.name} | responnded with Success `
         );
-        console.log("attendance", attendance);
+        //console.log("attendance", attendance);
         return res.status(200).json(attendance);
       } else {
         logger.error(
@@ -288,6 +292,7 @@ const editAttendanceData = async (req, res) => {
         },
         {
           name: data.name,
+          emp_no: data.emp_no,
           present: data.present,
           totalWorkingDays: data.totalWorkingDays,
           remark: data.remark,

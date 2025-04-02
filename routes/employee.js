@@ -9,7 +9,7 @@ const {
   deleteEmployee,
   getAllEmployees,
   getClientEmployees,
-
+  updateEmployeeWithEmpCode,
   getEmployee,
   getEmployeeByEmail,
 
@@ -39,6 +39,7 @@ router.post(
       min: 5,
     }),
     body("fatherHusband_name", "Enter a valid fatherHusband_name").notEmpty(),
+    body("gender", "Enter a valid gender").notEmpty(),
     body("email", "Enter a Valid Email").isEmail(),
     body("whatsapp_no", "Enter a Valid Whatsapp Number").notEmpty().isNumeric(),
     body("password", "Password must have atlest 5 character").notEmpty(),
@@ -52,6 +53,7 @@ router.post(
     body("department", "Select a valid department id").notEmpty(),
     body("designation", "Enter a Valid designation").notEmpty(),
     body("date_of_joining", "Enter a Valid date_of_joining").isDate(),
+    body("weeklyOff").optional().isArray(),
 
     body("adhar_card", "Enter a Valid adhar_card"),
     body("uan_no", "Enter a Valid uan_no"),
@@ -106,6 +108,7 @@ router.put(
   [
     body("name", "Enter a valid name").isLength({ min: 3 }),
     body("fatherHusband_name", "Enter a valid fatherHusband_name").notEmpty(),
+    body("gender", "Enter a valid gender").notEmpty(),
     body("email", "Enter a Valid Email").isEmail(),
     body("whatsapp_no", "Enter a Valid Whatsapp Number").notEmpty().isNumeric(),
     body("city", "Enter a Valid city"),
@@ -114,7 +117,8 @@ router.put(
     body("address", "Enter a Valid address"),
     body("pin_code", "Enter a Valid pin_code").isNumeric(),
     body("designation", "Enter a Valid designation").notEmpty(),
-
+    body("weeklyOff").optional().isArray(),
+    
     body("adhar_card", "Enter a Valid adhar_card"),
     body("uan_no", "Enter a Valid uan_no"),
     body("pf_no", "Enter a Valid pf_no"),
@@ -141,6 +145,24 @@ router.put(
   updateEmployee
 );
 
+//@desc Update Employee Leaves using emp_code
+//@route PUT /api/v1/employee/updateempwithcode/:id
+//@access Private: Needs Login
+router.put(
+  "/updateempwithcode/:id",
+  [
+    body("leaves", "Leaves field is required").notEmpty(),
+    body("leaves.cl.balance", "Leaves.cl.balance is required").notEmpty(),
+    body("leaves.cl.absentDates", "Leaves.cl.absentDates must be an array").isArray(),
+    body("leaves.sl.balance", "Leaves.sl.balance is required").notEmpty(),
+    body("leaves.sl.absentDates", "Leaves.sl.absentDates must be an array").isArray(),
+    body("leaves.pl.balance", "Leaves.pl.balance is required").notEmpty(),
+    body("leaves.pl.absentDates", "Leaves.pl.absentDates must be an array").isArray(),
+  ],
+  validateToken,
+  updateEmployeeWithEmpCode
+);
+
 //@desc Get all Employees
 //@route GET /api/v1/employee/getall
 //@access Private: Needs Login
@@ -150,7 +172,7 @@ router.get("/getall", validateToken, getAllEmployees);
 //@route GET /api/v1/employee/client_id
 //@access Private: Needs Login
 router.get(
-  "/get/employees/by/client/:client_id",
+  "/client/:client_id",
   validateToken,
   getClientEmployees
 );

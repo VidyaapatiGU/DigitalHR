@@ -485,7 +485,6 @@ const getClient = async (req, res) => {
       }
 
       console.log("client", client);
-
       if (client.length > 0) {
         logger.info(
           `${ip}: API /api/v1/client/get/:${id} | User: ${loggedin_user.name} | responnded with Success `

@@ -42,6 +42,7 @@ router.post(
   [body("numberOfCL")],
   [body("numberOfPL")],
   [body("numberOfSL")],
+  [body("numberOfOT")],
 
   addAttendance
 );
@@ -55,6 +56,7 @@ router.post(
 
   [body("month_year", "Enter a valid month_year").notEmpty()],
   [body("name", "Enter a valid name").notEmpty()],
+  [body("emp_no", "Enter a valid emp_no").notEmpty()],
   [body("email", "Enter a valid email").notEmpty()],
   [body("present", "Enter a valid present").notEmpty()],
   [body("totalWorkingDays", "Enter a valid totalWorkingDays").notEmpty()],
@@ -124,6 +126,7 @@ router.put(
   "/edit/:attendance_id",
   validateToken,
   [body("name", "Enter a valid name").notEmpty()],
+  [body("emp_no")],
   [body("present", "Enter a valid present").notEmpty()],
   [body("totalWorkingDays")],
   [body("remark")],
@@ -135,7 +138,7 @@ router.put(
   [body("absentDaysSL")],
   [body("numberOfPL")],
   [body("absentDaysPL")],
-
+  [body("numberOfOT")],
   editAttendanceData
 );
 

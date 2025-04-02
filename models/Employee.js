@@ -42,6 +42,9 @@ const EmployeeSchema = new Schema({
   fatherHusband_name: {
     type: String,
   },
+  gender: {
+    type: String,
+  },
   email: {
     type: String,
     required: true,
@@ -135,7 +138,25 @@ const EmployeeSchema = new Schema({
   e_esic: {
     type: Number,
   },
-
+  weeklyOff: {
+    type: [String],
+    default: [],
+    enum: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+  },
+  leaves: {
+    cl: { 
+      balance: { type: String, default: "0" },
+      absentDates: { type: [String], default: [] }
+    },
+    sl: { 
+      balance: { type: String, default: "0" },
+      absentDates: { type: [String], default: [] }
+    },
+    pl: { 
+      balance: { type: String, default: "0" },
+      absentDates: { type: [String], default: [] }
+    },
+  },  
   adhar_proof: {
     type: Boolean,
     default: false,

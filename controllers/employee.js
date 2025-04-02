@@ -142,6 +142,7 @@ const createEmployee = async (req, res) => {
 
       name: data.name,
       fatherHusband_name: data.fatherHusband_name,
+      gender: data.gender,
       email: data.email,
       whatsapp_no: data.whatsapp_no,
       designation: data.designation,
@@ -153,7 +154,6 @@ const createEmployee = async (req, res) => {
       country: data.country,
       state: data.state,
       pin_code: data.pin_code,
-
       adhar_card: data.adhar_card,
       gross: data.gross,
       uan_no: data.uan_no,
@@ -175,6 +175,12 @@ const createEmployee = async (req, res) => {
       esi: data.esi || false,
       e_epf: data.e_epf,
       e_esic: data.e_esic,
+      weeklyOff: data.weeklyOff || [],
+      leaves: {
+        sl: { balance: "6", absentDates: [] },
+        cl: { balance: "6", absentDates: [] },
+        pl: { balance: "6", absentDates: [] },
+      },
     });
 
     console.log("newEmployee", newEmployee);
@@ -283,8 +289,9 @@ const createEmployeesByExcel = async (req, res) => {
           password: securedPass,
           last_emp_no: lastCount,
           name: data.employeeData[i].name,
-
+          
           fatherHusband_name: data.employeeData[i].fatherHusband_name || "",
+          gender: data.employeeData[i].gender || "",
           email: data.employeeData[i].email,
           whatsapp_no: data.employeeData[i].whatsapp_no,
           city: data.employeeData[i].city,
@@ -316,6 +323,11 @@ const createEmployeesByExcel = async (req, res) => {
           esi: data.employeeData[i].esi || false,
           e_epf: data.employeeData[i].e_epf || "",
           e_esic: data.employeeData[i].e_esic || "",
+          leaves: {
+            sl: { balance: "6", absentDates: [] },
+            cl: { balance: "6", absentDates: [] },
+            pl: { balance: "6", absentDates: [] },
+          },
         });
 
         logger.info(
@@ -377,6 +389,7 @@ const updateCreatedEmployee = async (req, res) => {
         team: data.team,
         roleType: data.roleType,
         department: data.department,
+        weeklyOff: data.weeklyOff,
       }
     );
 
@@ -396,6 +409,7 @@ const updateCreatedEmployee = async (req, res) => {
         pin_code: data.pin_code,
         esi: data.esi,
         lwf: data.lwf,
+        weeklyOff: data.weeklyOff,
       },
       {
         new: true,
@@ -490,50 +504,98 @@ const AddClientDetails = async (req, res) => {
 };
 
 //@desc Get all Employees
-//@route GET /api/v1/employee/getall/:client_id
+//@route GET /api/v1/employees/client/:client_id
 //@access Private: Needs Login
 const getClientEmployees = async (req, res) => {
-  const user = req.user;
+  // Determine the client's IP address
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   const client_id = req.params.client_id;
-  //console.log("client_id", client_id);
+
+  const user = req.user;
+
+  // Log initial request details
+  logger.info(`Incoming request to get employees for client ${client_id}`, {
+    method: req.method,
+    url: req.originalUrl,
+    client_id: client_id,
+    user: user ? user.name : "Unauthenticated",
+    ip: ip,
+    timestamp: new Date().toISOString(),
+  });
+
+  console.log("client_id:", client_id);
 
   try {
     if (user) {
+      // First attempt: search by client_id field
       let employees = await Employee.find({
         client_id: client_id,
         active: true,
       });
+      logger.info(`Found ${employees.length} employee(s) for client_id query`, {
+        client_id: client_id,
+        queryType: "client_id",
+        employeeCount: employees.length,
+        timestamp: new Date().toISOString(),
+      });
 
+      // Fallback: search by client_user_id if no results found
       if (employees.length <= 0) {
         employees = await Employee.find({
           client_user_id: client_id,
           active: true,
         });
+        logger.info(`Found ${employees.length} employee(s) for client_user_id query`, {
+          client_id: client_id,
+          queryType: "client_user_id",
+          employeeCount: employees.length,
+          timestamp: new Date().toISOString(),
+        });
       }
 
-      console.log("employees", employees);
+      console.log("employees:", employees);
 
+      // Log success with detailed information
       logger.info(
-        `${ip}: API /api/v1/employee/getall | User: ${user.name} | responnded with Success `
+        `${ip}: API /api/v1/employees/client/${client_id} | User: ${user.name} responded with success. Employees retrieved.`,
+        {
+          client_id: client_id,
+          employeeCount: employees.length,
+          user: user.name,
+          timestamp: new Date().toISOString(),
+        }
       );
-      return await res.status(200).json({
+
+      return res.status(200).json({
         data: employees,
-        message: "employees retrived successfully",
+        message: "employees retrieved successfully",
       });
     } else {
+      // Log unauthorized access attempt
       logger.error(
-        `${ip}: API /api/v1/employee/getall | User: ${user.name} | responnded with Client is not Autherized `
+        `${ip}: API /api/v1/employees/client/${client_id} | Unauthenticated access attempt.`,
+        {
+          client_id: client_id,
+          timestamp: new Date().toISOString(),
+        }
       );
-      return res.status(401).send({ message: "User is not Autherized" });
+      return res.status(401).send({ message: "User is not Authorized" });
     }
   } catch (error) {
+    // Log the error details with stack trace and additional context
     logger.error(
-      `${ip}: API /api/v1/employee/getall | User: ${user.name} | responnded with Error `
+      `${ip}: API /api/v1/employees/client/${client_id} | Error occurred: ${error.message}`,
+      {
+        client_id: client_id,
+        user: user ? user.name : "Unknown",
+        errorStack: error.stack,
+        timestamp: new Date().toISOString(),
+      }
     );
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 
 //@desc Get all Employees
 //@route GET /api/v1/employee/getall
@@ -544,7 +606,7 @@ const getAllEmployees = async (req, res) => {
 
   try {
     if (user && user.roleType.name === "super_admin") {
-      console.log("user: ", user);
+      //console.log("user: ", user);
 
       const employees = await Employee.find({ active: true });
 
@@ -664,11 +726,14 @@ const getEmployeeByEmail = async (req, res) => {
   }
 };
 //@desc Update Employee with id
-//@route PUT /api/v1/employee/update/:user_id
+//@route PUT /api/v1/employee/update/:_id
 //@access Private: Needs Login
 const updateEmployee = async (req, res) => {
   const loggedin_user = req.user;
   const { id } = req.params;
+  
+  // Log the id received from the URL:
+  logger.info(`ID from URL: ${id}`);
 
   const data = matchedData(req);
   console.log("data: ", data);
@@ -685,13 +750,14 @@ const updateEmployee = async (req, res) => {
 
   if (loggedin_user) {
     try {
-      const oldUser = await Employee.findOne({ user_id: id });
+      const oldUser = await Employee.findOne({ _id: id });
       if (oldUser) {
         const result = await Employee.findOneAndUpdate(
-          { user_id: id },
+          { _id: id },
           {
             name: data.name,
             fatherHusband_name: data.fatherHusband_name,
+            gender: data.gender,
             whatsapp_no: data.whatsapp_no,
             city: data.city,
             designation: data.designation,
@@ -718,7 +784,7 @@ const updateEmployee = async (req, res) => {
             lwf: data.lwf,
             e_epf: data.e_epf,
             e_esic: data.e_esic,
-
+            weeklyOff: data.weeklyOff,
             updated_at: Date.now(),
           },
           {
@@ -736,6 +802,7 @@ const updateEmployee = async (req, res) => {
             country: data.country,
             state: data.state,
             pin_code: data.pin_code,
+            weeklyOff: data.weeklyOff,
           }
         );
 
@@ -766,6 +833,77 @@ const updateEmployee = async (req, res) => {
     return res.status(401).send({ message: "Employee is not Autherized" });
   }
 };
+
+
+//@desc Update Employee Leaves using emp_code
+//@route PUT /api/v1/employee/updateempwithcode/:id
+//@access Private: Needs Login
+const updateEmployeeWithEmpCode = async (req, res) => {
+  const loggedin_user = req.user;
+  // Here, "id" represents the employee's emp_code (stored in emp_no)
+  const { id } = req.params;
+  
+  // Log the emp_code received from the URL:
+  logger.info(`Emp Code from URL: ${id}`);
+
+  // Extract only the validated data from the request body
+  const data = matchedData(req);
+  console.log("data: ", data);
+
+  const errors = validationResult(req);
+  const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+
+  if (!errors.isEmpty()) {
+    logger.error(
+      `${ip}: API /api/v1/employee/updateempwithcode/${id} | User: ${loggedin_user.name} | responded with Validation Error`
+    );
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  if (loggedin_user) {
+    try {
+      // Find employee by emp_code (stored in emp_no)
+      const employee = await Employee.findOne({ emp_no: id });
+      if (employee) {
+        // Update only the leaves field using data.leaves
+        const result = await Employee.findOneAndUpdate(
+          { emp_no: id },
+          {
+            leaves: data.leaves,
+            updated_at: Date.now(),
+          },
+          { new: true }
+        );
+
+        logger.info(
+          `${ip}: API /api/v1/employee/updateempwithcode/${id} | User: ${loggedin_user.name} | responded with Success (Leaves Updated)`
+        );
+        return res
+          .status(200)
+          .json({ data: result, message: "Employee Leaves Updated Successfully" });
+      } else {
+        logger.info(
+          `${ip}: API /api/v1/employee/updateempwithcode/${id} | User: ${loggedin_user.name} | responded with Employee Not Found`
+        );
+        return res.status(200).json({ message: "Employee Not Found" });
+      }
+    } catch (error) {
+      logger.error(
+        `${ip}: API /api/v1/employee/updateempwithcode/${id} | User: ${loggedin_user.name} | responded with Error`,
+        { error: error.message }
+      );
+      return res
+        .status(500)
+        .json({ data: error, message: "Something went wrong" });
+    }
+  } else {
+    logger.error(
+      `${ip}: API /api/v1/employee/updateempwithcode/${id} | User: ${loggedin_user.name} | responded with Employee is not Authorized`
+    );
+    return res.status(401).send({ message: "Employee is not Authorized" });
+  }
+};
+
 
 //@desc Delete Employee with id (we are updating active to false )
 //@route PUT /api/v1/employee/delete/:id
@@ -1160,6 +1298,7 @@ module.exports = {
   getEmployee,
 
   updateEmployee,
+  updateEmployeeWithEmpCode,
   deleteEmployee,
 
   AppDisEmployee,

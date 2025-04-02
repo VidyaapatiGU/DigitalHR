@@ -11,7 +11,7 @@ const connectToMongo = async () => {
       connect.connection.name
     );
     logger.info(
-      `Connected to Mongo Successfully! Host: ${connect.connection.host}, DB Name:${connect.connection.name} `
+      `Connected to Mongo Successfully! Host: ${connect.connection.host}, DB Name:${connect.connection.name}`
     );
   } catch (err) {
     console.log({ data: err, message: "Connected to Mongo Failed!" });
@@ -20,4 +20,4 @@ const connectToMongo = async () => {
   }
 };
 
-module.exports = connectToMongo;
+module.exports = { connectToMongo, mongoose };  // Export mongoose as well

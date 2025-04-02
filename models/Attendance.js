@@ -10,10 +10,10 @@ const AttendanceSchema = new Schema({
     ref: "User",
     required: true,
   },
-  /* emp_no: {
+  emp_no: {
     type: String,
     required: true,
-  }, */
+  },
   gross: {
     type: Number,
   },
@@ -82,6 +82,11 @@ const AttendanceSchema = new Schema({
   },
   absentDaysSL: {
     type: String,
+  },
+  numberOfOT: {
+    type: Number,
+    required: true,
+    default: 0,
   },
   remark: {
     type: String,
