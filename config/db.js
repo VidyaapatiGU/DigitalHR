@@ -1,23 +1,33 @@
 const mongoose = require("mongoose");
 const logger = require("../config/logger.js");
-const mongoDBURI = process.env.MONGOURL;
+
+// Use process.env.MONGO_URI to match GitHub Secrets
+const mongoDBURI = process.env.MONGO_URI || process.env.MONGOURL;
 
 const connectToMongo = async () => {
   try {
-    const connect = await mongoose.connect(mongoDBURI);
+    if (!mongoDBURI) {
+      throw new Error("MONGO_URI is not set!");
+    }
+
+    const connect = await mongoose.connect(mongoDBURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
     console.log(
-      "Connected to Mongo Successfully!",
+      "✅ Connected to Mongo Successfully!",
       connect.connection.host,
       connect.connection.name
     );
     logger.info(
-      `Connected to Mongo Successfully! Host: ${connect.connection.host}, DB Name:${connect.connection.name}`
+      `✅ Connected to Mongo Successfully! Host: ${connect.connection.host}, DB Name:${connect.connection.name}`
     );
   } catch (err) {
-    console.log({ data: err, message: "Connected to Mongo Failed!" });
-    logger.error(`Connected to Mongo Failed!`);
+    console.error("❌ MongoDB Connection Error:", err.message);
+    logger.error(`❌ Connected to Mongo Failed!`);
     process.exit(1);
   }
 };
 
-module.exports = { connectToMongo, mongoose };  // Export mongoose as well
+module.exports = { connectToMongo, mongoose };
