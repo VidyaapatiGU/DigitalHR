@@ -1,0 +1,162 @@
+body {
+  min-height: 100vh;
+}
+.hind-light {
+  font-family: 'Hind', sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.hind-regular {
+  font-family: 'Hind', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.hind-medium {
+  font-family: 'Hind', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.hind-semibold {
+  font-family: 'Hind', sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.hind-bold {
+  font-family: 'Hind', sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.mooli-regular {
+  font-family: 'Mooli', sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.mooli-500 {
+  font-family: 'Mooli', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.mooli {
+  font-family: 'Mooli', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.source-200 {
+  font-family: 'Source Sans 3', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 200;
+  font-style: normal;
+}
+.source-300 {
+  font-family: 'Source Sans 3', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+}
+.source-400 {
+  font-family: 'Source Sans 3', sans-serif;
+  font-optical-sizing: auto;
+
+  font-weight: 400;
+  font-style: normal;
+}
+.source-500 {
+  font-family: 'Source Sans 3', sans-serif;
+  font-optical-sizing: auto;
+
+  font-weight: 500;
+  font-style: normal;
+}
+.source-600 {
+  font-family: 'Source Sans 3', sans-serif;
+  font-optical-sizing: auto;
+
+  font-weight: 600;
+  font-style: normal;
+}
+.source-700 {
+  font-family: 'Source Sans 3', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+.source-800 {
+  font-family: 'Source Sans 3', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 800;
+  font-style: normal;
+}
+.source-900 {
+  font-family: 'Source Sans 3', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.open-sans {
+  font-family: 'Open Sans', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 13px;
+  font-style: normal;
+  font-variation-settings: 'wdth' 100;
+}
+
+.sub-heading {
+  color: rgb(43, 57, 106);
+}
+
+.font12 {
+  font-size: 14px;
+}
+
+.font14 {
+  font-size: 14px;
+}
+.font16 {
+  font-size: 16px;
+}
+.font18 {
+  font-size: 18px;
+}
+.font20 {
+  font-size: 20px;
+}
+.font22 {
+  font-size: 22px;
+}
+.font24 {
+  font-size: 24px;
+}
+.font26 {
+  font-size: 26px;
+}
+.font28 {
+  font-size: 28px;
+}
+.font30 {
+  font-size: 30px;
+}
+.font32 {
+  font-size: 32px;
+}
+.font34 {
+  font-size: 34px;
+}
+.font36 {
+  font-size: 36px;
+}
+.font38 {
+  font-size: 38px;
+}
+.font40 {
+  font-size: 40px;
+}
